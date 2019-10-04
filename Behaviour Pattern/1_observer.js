@@ -1,0 +1,73 @@
+/* 
+*  The Observer pattern offers a subscription model in which objects subscribe to an event and get notified when the event occurs. 
+*/
+
+/*
+*       The objects participating in this pattern are:
+
+Subject -- In sample code: Click
+    - maintains list of observers. Any number of Observer objects may observe a Subject
+    - implements an interface that lets observer objects subscribe or unsubscribe
+    - sends a notification to its observers when its state changes
+
+Observers -- In sample code: clickHandler
+    - has a function signature that can be invoked when Subject changes (i.e. event occurs)
+
+*/
+
+
+function Click() {
+    this.handlers = [];  // observers
+}
+Click.prototype = {
+ 
+    subscribe: function(fn) {
+        this.handlers.push(fn);
+    },
+ 
+    unsubscribe: function(fn) {
+        this.handlers = this.handlers.filter(
+            function(item) {
+                if (item !== fn) {
+                    return item;
+                }
+            }
+        );
+    },
+ 
+    fire: function(o, thisObj) {
+        var scope = thisObj || window;
+        this.handlers.forEach(function(item) {
+            item.call(scope, o);
+        });
+    }
+}
+ 
+// log helper
+ 
+var log = (function() {
+    var log = "";
+ 
+    return {
+        add: function(msg) { log += msg + "\n"; },
+        show: function() { alert(log); log = ""; }
+    }
+})();
+ 
+function run() {
+ 
+    var clickHandler = function(item) { 
+        log.add("fired: " + item); 
+    };
+ 
+    var click = new Click();
+ 
+    click.subscribe(clickHandler);
+    click.fire('event #1');
+    click.unsubscribe(clickHandler);
+    click.fire('event #2');
+    click.subscribe(clickHandler);
+    click.fire('event #3');
+ 
+    log.show();
+}
